@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-5 mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <span class="badge badge-soft rounded-pill mb-3">AI-Powered Employability & Skill Recommendation Platform</span>
+            <h1 class="display-5 fw-bold mb-3">Predict employability, expose skill gaps, and recommend the next best move.</h1>
+            <p class="lead text-secondary mb-4">This Django platform connects candidate profiles to your ML workflow, generates employability scores, and turns the output into skill, course, career-path, and job-matching recommendations.</p>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'prediction:dashboard' %}" class="btn btn-primary btn-lg me-2">Start assessment</a>
+                <a href="{% url 'jobs:list' %}" class="btn btn-outline-dark btn-lg">Browse employers and jobs</a>
+            {% else %}
+                <a href="{% url 'users:register' %}" class="btn btn-primary btn-lg me-2">Create account</a>
+                <a href="{% url 'users:login' %}" class="btn btn-outline-dark btn-lg">Login</a>
+            {% endif %}
+        </div>
+        <div class="col-lg-5">
+            <div class="row g-3">
+                <div class="col-6">
+                    <div class="metric-card bg-white p-4">
+                        <div class="text-secondary small">Assessments</div>
+                        <div class="fs-2 fw-bold">{{ assessment_count }}</div>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="metric-card bg-white p-4">
+                        <div class="text-secondary small">Active Jobs</div>
+                        <div class="fs-2 fw-bold">{{ job_count }}</div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="metric-card p-4 text-white" style="background: linear-gradient(135deg, #9e4127 0%, #d47649 55%, #efb35f 100%);">
+                        <div class="small text-white-50">Core workflow</div>
+                        <div class="fw-semibold mt-2">1. Candidate input</div>
+                        <div class="fw-semibold">2. Model prediction</div>
+                        <div class="fw-semibold">3. Skill and career recommendations</div>
+                        <div class="fw-semibold">4. Job matching and reporting</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="panel-card h-100 p-4 interactive-row">
+            <h3 class="h5">Prediction dashboard</h3>
+            <p class="text-secondary">Capture degree, field, skills, experience level, and market indicators to score employability risk.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel-card h-100 p-4 interactive-row">
+            <h3 class="h5">Skill recommendations</h3>
+            <p class="text-secondary">Translate model output into concrete skill, course, and portfolio recommendations for each graduate.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="panel-card h-100 p-4 interactive-row">
+            <h3 class="h5">Admin analytics</h3>
+            <p class="text-secondary">Track employability trends, common skill gaps, and role-matching patterns across the platform.</p>
+        </div>
+    </div>
+</section>
+
+<section class="panel-card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0">Recent assessments</h2>
+        {% if request.user.is_authenticated %}
+            <a href="{% url 'recommendations:list' %}" class="btn btn-sm btn-outline-primary">Open all recommendations</a>
+        {% endif %}
+    </div>
+    {% if latest_assessments %}
+        <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Candidate</th>
+                        <th>Field</th>
+                        <th>Score</th>
+                        <th>Risk</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for assessment in latest_assessments %}
+                        <tr>
+                            <td><a class="action-link" href="{% url 'prediction:assessment_detail' assessment.pk %}">{{ assessment.full_name }}</a></td>
+                            <td>{{ assessment.field_of_study }}</td>
+                            <td>{{ assessment.employability_score }}%</td>
+                            <td class="risk-{{ assessment.risk_category|lower }}">{{ assessment.risk_category }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="text-secondary mb-0">
+            {% if request.user.is_authenticated %}
+                No assessments yet. Run the first prediction to populate the dashboard.
+            {% else %}
+                Login to keep your predictions private and access role-based dashboards.
+            {% endif %}
+        </p>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center g-4">
+    <div class="col-lg-5">
+        <div class="hero-card auth-hero p-4 p-lg-5 warm-section">
+            <span class="badge badge-soft rounded-pill mb-2">Authentication</span>
+            <h1 class="h2 mb-2">Welcome back</h1>
+            <p class="text-secondary mb-4">Sign in to access your private results, employer directory, and role-based dashboard.</p>
+            <form method="post" class="d-grid gap-3">
+                {% csrf_token %}
+                <div>
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+                <div>
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                </div>
+                {% if form.errors %}
+                    <div class="alert alert-danger mb-0">{{ form.errors }}</div>
+                {% endif %}
+                <button class="btn btn-primary btn-lg" type="submit">Login to platform</button>
+            </form>
+            <p class="mt-3 mb-0 text-secondary">No account yet? <a class="action-link" href="{% url 'users:register' %}">Create one here</a></p>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="hero-accent">
+            <div class="small text-white-50 mb-2">Why log in?</div>
+            <div class="fw-semibold mb-2">Keep your employability reports private</div>
+            <div class="fw-semibold mb-2">Track your recommendations over time</div>
+            <div class="fw-semibold">Browse employers and listed opportunities</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

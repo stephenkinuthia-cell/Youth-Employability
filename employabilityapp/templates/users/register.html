@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <div class="hero-card auth-hero p-4 p-lg-5 warm-section">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                <div>
+                    <span class="badge badge-soft rounded-pill mb-2">Authentication</span>
+                    <h1 class="h2 mb-2">Create an account</h1>
+                    <p class="text-secondary mb-0">Choose your role and unlock the right workspace. Users get private reports, employers list jobs, and admins manage the platform with a protected code.</p>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <span class="step-chip">1. Choose role</span>
+                    <span class="step-chip">2. Add contact details</span>
+                    <span class="step-chip">3. Start using the app</span>
+                </div>
+            </div>
+
+            <form method="post" class="row g-4" id="registrationForm">
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="panel-card p-4 h-100 warm-section">
+                        <h2 class="h5 mb-3">Account details</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form.first_name.label_tag }} {{ form.first_name }}</div>
+                            <div class="col-md-6">{{ form.last_name.label_tag }} {{ form.last_name }}</div>
+                            <div class="col-md-6">{{ form.username.label_tag }} {{ form.username }}</div>
+                            <div class="col-md-6">{{ form.email.label_tag }} {{ form.email }}</div>
+                            <div class="col-md-6">{{ form.password1.label_tag }} {{ form.password1 }}</div>
+                            <div class="col-md-6">{{ form.password2.label_tag }} {{ form.password2 }}</div>
+                            <div class="col-md-6">{{ form.role.label_tag }} {{ form.role }}</div>
+                            <div class="col-md-6 admin-only">{{ form.admin_code.label_tag }} {{ form.admin_code }}</div>
+                            <div class="col-md-6">{{ form.phone_number.label_tag }} {{ form.phone_number }}</div>
+                            <div class="col-md-6">{{ form.location.label_tag }} {{ form.location }}</div>
+                            <div class="col-12">{{ form.bio.label_tag }} {{ form.bio }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel-card p-4 h-100 student-only warm-section">
+                        <h2 class="h5 mb-3">User profile</h2>
+                        <p class="form-note mb-3">This helps the prediction engine start with a meaningful baseline.</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form.degree_level.label_tag }} {{ form.degree_level }}</div>
+                            <div class="col-md-6">{{ form.field_of_study.label_tag }} {{ form.field_of_study }}</div>
+                            <div class="col-md-6">{{ form.graduation_year.label_tag }} {{ form.graduation_year }}</div>
+                            <div class="col-md-6">{{ form.experience_level.label_tag }} {{ form.experience_level }}</div>
+                            <div class="col-12">{{ form.skills_text.label_tag }} {{ form.skills_text }}</div>
+                            <div class="col-12">{{ form.career_goal.label_tag }} {{ form.career_goal }}</div>
+                        </div>
+                    </div>
+
+                    <div class="panel-card p-4 h-100 employer-only warm-section">
+                        <h2 class="h5 mb-3">Employer profile and first job</h2>
+                        <p class="form-note mb-3">Employers can publish opportunities immediately after signup.</p>
+                        <div class="row g-3">
+                            <div class="col-md-6">{{ form.company_name.label_tag }} {{ form.company_name }}</div>
+                            <div class="col-md-6">{{ form.industry.label_tag }} {{ form.industry }}</div>
+                            <div class="col-md-6">{{ form.contact_person.label_tag }} {{ form.contact_person }}</div>
+                            <div class="col-md-6">{{ form.company_size.label_tag }} {{ form.company_size }}</div>
+                            <div class="col-12">{{ form.website.label_tag }} {{ form.website }}</div>
+                            <div class="col-md-6">{{ form.job_title.label_tag }} {{ form.job_title }}</div>
+                            <div class="col-md-6">{{ form.job_location.label_tag }} {{ form.job_location }}</div>
+                            <div class="col-12">{{ form.job_description.label_tag }} {{ form.job_description }}</div>
+                            <div class="col-md-8">{{ form.job_required_skills.label_tag }} {{ form.job_required_skills }}</div>
+                            <div class="col-md-4">{{ form.minimum_score.label_tag }} {{ form.minimum_score }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.errors }}</div>
+                    </div>
+                {% endif %}
+
+                <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="hero-accent">
+                        <div class="small text-white-50">Protected admin signup</div>
+                        <div class="fw-semibold">Administrator accounts require a special code.</div>
+                    </div>
+                    <button class="btn btn-primary btn-lg" type="submit">Create account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const roleField = document.getElementById('id_role');
+    const studentBlocks = document.querySelectorAll('.student-only');
+    const employerBlocks = document.querySelectorAll('.employer-only');
+    const adminBlocks = document.querySelectorAll('.admin-only');
+
+    function toggleRegistrationSections() {
+        const role = roleField.value;
+        studentBlocks.forEach(el => el.style.display = role === 'student' ? 'block' : 'none');
+        employerBlocks.forEach(el => el.style.display = role === 'employer' ? 'block' : 'none');
+        adminBlocks.forEach(el => el.style.display = role === 'admin' ? 'block' : 'none');
+    }
+
+    toggleRegistrationSections();
+    roleField.addEventListener('change', toggleRegistrationSections);
+</script>
+{% endblock %}
