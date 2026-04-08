@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-4 p-lg-5 mb-4 warm-section">
+    <span class="badge badge-soft rounded-pill mb-2">Admin analytics</span>
+    <h1 class="h2 mb-2">Skill gap and employability analytics</h1>
+    <p class="text-secondary mb-0">This page gives universities, employers, and program administrators a quick view of candidate outcomes, recurring skill gaps, and the platform activity trend.</p>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Assessments</div><div class="fs-2 fw-bold">{{ assessment_count }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Low risk</div><div class="fs-2 fw-bold text-success">{{ low_risk_count }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">High risk</div><div class="fs-2 fw-bold text-danger">{{ high_risk_count }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Active jobs</div><div class="fs-2 fw-bold">{{ job_count }}</div></div></div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Total app visits</div><div class="fs-3 fw-bold">{{ visits_total }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Visits last 7 days</div><div class="fs-3 fw-bold">{{ visits_last_week }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Active users</div><div class="fs-3 fw-bold">{{ active_users }}</div></div></div>
+    <div class="col-md-3"><div class="metric-card bg-white p-4 interactive-row"><div class="text-secondary small">Effectiveness</div><div class="fs-3 fw-bold">{{ effectiveness_rate }}%</div></div></div>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-6">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Platform trends</div>
+                    <h2 class="h4 mb-0">Most common skills among graduates</h2>
+                </div>
+            </div>
+            {% for skill, count in top_skills %}
+                <div class="d-flex justify-content-between border-bottom py-2 interactive-row px-2 rounded-3">
+                    <span>{{ skill }}</span>
+                    <strong>{{ count }}</strong>
+                </div>
+            {% empty %}
+                <p class="text-secondary mb-0">No skill data yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Gap hotspots</div>
+                    <h2 class="h4 mb-0">Most frequent recommendation gaps</h2>
+                </div>
+            </div>
+            {% for gap, count in top_gaps %}
+                <div class="d-flex justify-content-between border-bottom py-2 interactive-row px-2 rounded-3">
+                    <span>{{ gap }}</span>
+                    <strong>{{ count }}</strong>
+                </div>
+            {% empty %}
+                <p class="text-secondary mb-0">No recommendation data yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mt-1">
+    <div class="col-lg-7">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Control center</div>
+                    <h2 class="h4 mb-0">User and employer control</h2>
+                </div>
+                <span class="soft-stat">Admin actions</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in users %}
+                            <tr>
+                                <td><a class="chip-link" href="#">{{ item.username }}</a></td>
+                                <td><span class="badge badge-soft rounded-pill">{{ item.platform_profile.role|title }}</span></td>
+                                <td>
+                                    {% if item.is_active %}
+                                        <span class="badge text-bg-success rounded-pill">Active</span>
+                                    {% else %}
+                                        <span class="badge text-bg-secondary rounded-pill">Disabled</span>
+                                    {% endif %}
+                                </td>
+                                <td class="d-flex flex-wrap gap-2">
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="toggle_active">
+                                        <button class="btn btn-sm btn-outline-dark" type="submit">Toggle</button>
+                                    </form>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="set_student">
+                                        <button class="btn btn-sm btn-outline-primary" type="submit">Make user</button>
+                                    </form>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="user_id" value="{{ item.id }}">
+                                        <input type="hidden" name="action" value="set_employer">
+                                        <button class="btn btn-sm btn-outline-success" type="submit">Make employer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Employer directory</div>
+                    <h2 class="h4 mb-0">Employers on the platform</h2>
+                </div>
+            </div>
+            {% for employer in employers %}
+                <div class="list-card interactive-row mb-3">
+                    <strong><a class="surface-link" href="{% url 'jobs:list' %}">{{ employer.company_name }}</a></strong>
+                    <div class="text-secondary mt-2">{{ employer.industry }} · {{ employer.contact_person }}</div>
+                </div>
+            {% empty %}
+                <p class="text-secondary mb-0">No employers registered yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

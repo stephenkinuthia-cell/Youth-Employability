@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-4 p-lg-5 mb-4 warm-section">
+    <div class="d-flex justify-content-between flex-wrap gap-4">
+        <div>
+            <span class="badge badge-soft rounded-pill mb-2">{{ assessment.field_of_study }}</span>
+            <h1 class="h2 mb-2">{{ assessment.full_name }}</h1>
+            <p class="text-secondary mb-0">Assessment created on {{ assessment.created_at|date:"M d, Y H:i" }}. Model status: {{ assessment.model_status }}.</p>
+        </div>
+        <div class="score-shell text-end">
+            <div class="section-kicker mb-2">Employability score</div>
+            <div class="display-4 fw-bold text-primary">{{ assessment.employability_score }}%</div>
+            <div class="fs-5 risk-{{ assessment.risk_category|lower }}">{{ assessment.risk_category }} employability risk</div>
+            <a href="{% url 'prediction:download_report' assessment.pk %}" class="btn btn-outline-primary mt-3">Download AI report</a>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-lg-4">
+        <div class="spotlight-card h-100">
+            <div class="section-kicker mb-2">Candidate profile</div>
+            <div class="fw-semibold">{{ assessment.degree_level }} / {{ assessment.experience_level|title }}</div>
+            <div class="text-secondary mt-2">{{ assessment.region }} · {{ assessment.graduation_year }}</div>
+            <div class="mt-3 text-secondary small">Current skills</div>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+                {% for skill in assessment.current_skills %}
+                    <span class="chip-link">{{ skill }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="spotlight-card h-100">
+            <div class="section-kicker mb-2">Strengths</div>
+            <ul class="mt-3 mb-0">
+                {% for item in assessment.strengths %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="spotlight-card h-100">
+            <div class="section-kicker mb-2">Watch areas</div>
+            <ul class="mt-3 mb-0">
+                {% for item in assessment.weaknesses %}
+                    <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-4">
+    <div class="col-lg-7">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Recommendation engine</div>
+                    <h2 class="h4 mb-0">Personalized skill recommendations</h2>
+                </div>
+                <a href="{% url 'recommendations:list' %}" class="btn btn-sm btn-outline-dark">All recommendations</a>
+            </div>
+            <div class="row g-3">
+                {% for recommendation in recommendations %}
+                    <div class="col-12">
+                        <div class="list-card interactive-row">
+                            <div class="d-flex justify-content-between flex-wrap gap-2 mb-2">
+                                <strong>{{ recommendation.title }}</strong>
+                                <span class="soft-stat">{{ recommendation.priority }}</span>
+                            </div>
+                            <div class="text-secondary mb-3">{{ recommendation.rationale }}</div>
+                            <div class="small">Suggested course: <a class="action-link" href="{{ recommendation.course_url }}" target="_blank" rel="noopener">{{ recommendation.course_name }}</a></div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-secondary mb-0">No recommendations have been generated for this assessment yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Career direction</div>
+                    <h2 class="h4 mb-0">Career path suggestions</h2>
+                </div>
+            </div>
+            {% for item in career_paths %}
+                <div class="list-card interactive-row mb-3">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <strong>{{ item.title }}</strong>
+                        <span class="soft-stat">{{ item.match_score }}% match</span>
+                    </div>
+                    <p class="text-secondary mb-0 mt-2">{{ item.summary }}</p>
+                </div>
+            {% empty %}
+                <p class="text-secondary mb-0">No career paths yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-lg-6">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Opportunity board</div>
+                    <h2 class="h4 mb-0">Matched jobs</h2>
+                </div>
+            </div>
+            {% for job in matched_jobs %}
+                <div class="list-card interactive-row mb-3">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <strong>{{ job.title }}</strong>
+                        <span class="soft-stat">{{ job.minimum_score }}% min score</span>
+                    </div>
+                    <div class="text-secondary mt-2">{{ job.industry }} · {{ job.location }}</div>
+                    <p class="mb-0 mt-2">{{ job.description|truncatewords:20 }}</p>
+                </div>
+            {% empty %}
+                <p class="text-secondary mb-0">Add job postings in the admin to activate job matching.</p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel-card p-4 h-100 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Summary report</div>
+                    <h2 class="h4 mb-0">AI feedback summary</h2>
+                </div>
+            </div>
+            {% if report %}
+                <div class="list-card">
+                    <ul class="mb-0">
+                        {% for step in report.next_steps %}
+                            <li>{{ step }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                <p class="text-secondary mb-0">No report summary available.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Feedback Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; color: #14213d; margin: 2rem; line-height: 1.6; }
+        h1, h2 { color: #0d3b66; }
+        .meta { background: #f3f7fb; padding: 1rem; border-radius: 12px; }
+    </style>
+</head>
+<body>
+    <h1>AI Employability Feedback Report</h1>
+    <div class="meta">
+        <strong>Candidate:</strong> {{ assessment.full_name }}<br>
+        <strong>Email:</strong> {{ assessment.email }}<br>
+        <strong>Field of Study:</strong> {{ assessment.field_of_study }}<br>
+        <strong>Employability Score:</strong> {{ assessment.employability_score }}%<br>
+        <strong>Risk Category:</strong> {{ assessment.risk_category }}
+    </div>
+
+    <h2>Strengths</h2>
+    <ul>
+        {% for item in report.strengths %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Weaknesses</h2>
+    <ul>
+        {% for item in report.weaknesses %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Recommendations</h2>
+    <ul>
+        {% for item in recommendations %}
+            <li><strong>{{ item.title }}</strong>: {{ item.rationale }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Career Paths</h2>
+    <ul>
+        {% for item in career_paths %}
+            <li><strong>{{ item.title }}</strong>: {{ item.summary }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

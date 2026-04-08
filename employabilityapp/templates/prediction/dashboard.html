@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-11">
+        <div class="hero-card p-4 p-lg-5 warm-section">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+                <div>
+                    <span class="badge badge-soft rounded-pill mb-2">Step-by-step UI</span>
+                    <h1 class="h2 mb-2">Employability prediction dashboard</h1>
+                    <p class="text-secondary mb-0">Fill in the candidate profile, run the prediction, and generate a recommendation-ready result page.</p>
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <span class="step-chip">1. Candidate details</span>
+                    <span class="step-chip">2. Market fit signals</span>
+                    <span class="step-chip">3. AI score and recommendations</span>
+                </div>
+            </div>
+
+            <form method="post" class="row g-4">
+                {% csrf_token %}
+                <div class="col-lg-6">
+                    <div class="panel-card p-4 h-100 warm-section">
+                        <h2 class="h5 mb-3">Candidate profile</h2>
+                        <div class="row g-3">
+                            <div class="col-12">{{ form.full_name.label_tag }} {{ form.full_name }}</div>
+                            <div class="col-12">{{ form.email.label_tag }} {{ form.email }}</div>
+                            <div class="col-md-6">{{ form.degree_level.label_tag }} {{ form.degree_level }}</div>
+                            <div class="col-md-6">{{ form.field_of_study.label_tag }} {{ form.field_of_study }}</div>
+                            <div class="col-md-6">{{ form.region.label_tag }} {{ form.region }}</div>
+                            <div class="col-md-6">{{ form.graduation_year.label_tag }} {{ form.graduation_year }}</div>
+                            <div class="col-md-6">{{ form.experience_level.label_tag }} {{ form.experience_level }}</div>
+                            <div class="col-md-6">{{ form.desired_industry.label_tag }} {{ form.desired_industry }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="panel-card p-4 h-100 warm-section">
+                        <h2 class="h5 mb-3">Market indicators</h2>
+                        <div class="row g-3">
+                            <div class="col-md-4">{{ form.average_starting_salary.label_tag }} {{ form.average_starting_salary }}</div>
+                            <div class="col-md-4">{{ form.skill_demand_score.label_tag }} {{ form.skill_demand_score }}</div>
+                            <div class="col-md-4">{{ form.employer_reputation_score.label_tag }} {{ form.employer_reputation_score }}</div>
+                            <div class="col-md-6">{{ form.remote_work_availability.label_tag }} {{ form.remote_work_availability }}</div>
+                        </div>
+                        <div class="hero-accent mt-4">
+                            <div class="small text-white-50">Signals that matter</div>
+                            <div class="fw-semibold">Demand, salary, reputation, and flexibility all shape employability strength.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="panel-card p-4 warm-section">
+                        <h2 class="h5 mb-3">Current skills</h2>
+                        <p class="form-note mb-3">{{ form.skills.help_text }}</p>
+                        <div class="row row-cols-1 row-cols-md-3 g-3">
+                            {% for checkbox in form.skills %}
+                                <div class="col">
+                                    <label class="choice-card">
+                                        {{ checkbox.tag }} {{ checkbox.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if form.errors %}
+                    <div class="col-12">
+                        <div class="alert alert-danger mb-0">{{ form.errors }}</div>
+                    </div>
+                {% endif %}
+
+                <div class="col-12 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div class="hero-accent">
+                        <div class="small text-white-50">Outcome</div>
+                        <div class="fw-semibold">You will get a score, risk category, report, skill recommendations, and suggested career paths.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">Run employability analysis</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

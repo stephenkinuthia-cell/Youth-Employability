@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-4 p-lg-5 warm-section">
+    <div class="d-flex justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <span class="badge badge-soft rounded-pill mb-2">Jobs module</span>
+            <h1 class="h2 mb-1">Job matching board</h1>
+            <p class="text-secondary mb-0">Employers can post roles and the platform can match them to assessments based on minimum employability score and skill profile.</p>
+        </div>
+        <a href="/admin/jobs/jobposting/" class="btn btn-outline-primary">Manage jobs in admin</a>
+    </div>
+
+    <div class="row g-4">
+        {% if role == 'admin' or role == 'employer' %}
+            <div class="col-12">
+                <div class="panel-card p-4 warm-section">
+                    <div class="section-head">
+                        <div>
+                            <div class="section-kicker">Employer action</div>
+                            <h2 class="h4 mb-0">Add a job listing</h2>
+                        </div>
+                    </div>
+                    <form method="post" class="row g-3">
+                        {% csrf_token %}
+                        <div class="col-md-6">{{ form.title.label_tag }} {{ form.title }}</div>
+                        <div class="col-md-6">{{ form.industry.label_tag }} {{ form.industry }}</div>
+                        <div class="col-md-6">{{ form.location.label_tag }} {{ form.location }}</div>
+                        <div class="col-md-6">{{ form.minimum_score.label_tag }} {{ form.minimum_score }}</div>
+                        <div class="col-12">{{ form.description.label_tag }} {{ form.description }}</div>
+                        <div class="col-12">{{ form.required_skills.label_tag }} {{ form.required_skills }}</div>
+                        <div class="col-12 d-flex justify-content-end">
+                            <button class="btn btn-primary" type="submit">Publish job</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for job in jobs %}
+            <div class="col-lg-6">
+                <div class="panel-card p-4 h-100 interactive-row warm-section">
+                    <div class="d-flex justify-content-between gap-2 mb-2 align-items-start">
+                        <div>
+                            <div class="section-kicker mb-1">Opportunity</div>
+                            <h2 class="h5 mb-0">{{ job.title }}</h2>
+                        </div>
+                        <span class="soft-stat">{{ job.minimum_score }}% min</span>
+                    </div>
+                    <div class="text-secondary mb-3">{{ job.industry }} · {{ job.location }}</div>
+                    <div class="small text-secondary mb-3">Employer: <a class="action-link" href="{% url 'users:overview' %}">{{ job.employer.employer_profile.company_name|default:job.employer.username }}</a></div>
+                    <p class="mb-3">{{ job.description }}</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for skill in job.required_skills %}
+                            <span class="chip-link">{{ skill }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="panel-card p-4">
+                    <p class="text-secondary mb-0">No active jobs yet. Add a few sample postings in the admin to make the matching section feel alive.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

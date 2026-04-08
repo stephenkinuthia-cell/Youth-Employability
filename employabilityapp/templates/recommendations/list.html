@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-4 p-lg-5 warm-section">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+        <div>
+            <span class="badge badge-soft rounded-pill mb-2">Recommendations module</span>
+            <h1 class="h2 mb-1">Personalized recommendations</h1>
+            <p class="text-secondary mb-0">Each assessment stores skill actions, course suggestions, and career alternatives.</p>
+        </div>
+        <a href="{% url 'prediction:dashboard' %}" class="btn btn-primary">Create new assessment</a>
+    </div>
+
+    {% for assessment in assessments %}
+        <div class="panel-card p-4 mb-4 warm-section">
+            <div class="section-head">
+                <div>
+                    <div class="section-kicker">Assessment snapshot</div>
+                    <h2 class="h5 mb-1">{{ assessment.full_name }}</h2>
+                    <div class="text-secondary">{{ assessment.field_of_study }} · {{ assessment.employability_score }}%</div>
+                </div>
+                <a href="{% url 'prediction:assessment_detail' assessment.pk %}" class="btn btn-sm btn-outline-dark">Open result</a>
+            </div>
+            <div class="row g-3">
+                <div class="col-lg-7">
+                    {% for item in assessment.skill_recommendations.all %}
+                        <div class="list-card interactive-row mb-3">
+                            <div class="d-flex justify-content-between align-items-start gap-3">
+                                <strong>{{ item.title }}</strong>
+                                <span class="soft-stat">{{ item.priority }}</span>
+                            </div>
+                            <div class="text-secondary mt-2">{{ item.rationale }}</div>
+                        </div>
+                    {% empty %}
+                        <p class="text-secondary mb-0">No recommendations saved yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="col-lg-5">
+                    {% for item in assessment.career_paths.all %}
+                        <div class="list-card interactive-row mb-3">
+                            <strong>{{ item.title }}</strong>
+                            <div class="text-secondary mt-2">{{ item.match_score }}% match</div>
+                        </div>
+                    {% empty %}
+                        <p class="text-secondary mb-0">No career paths saved yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="panel-card p-4">
+            <p class="text-secondary mb-0">No recommendation records yet. Run a prediction to populate this page.</p>
+        </div>
+    {% endfor %}
+</section>
+{% endblock %}

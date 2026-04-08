@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-card p-4 p-lg-5 warm-section">
+    <div class="section-head">
+        <div>
+            <div class="section-kicker">Support inbox</div>
+            <h1 class="h3 mb-1">Messages from users and employers</h1>
+            <p class="text-secondary mb-0">Review issues submitted through the contact-admin channel and update their status.</p>
+        </div>
+        <a href="{% url 'analytics_dashboard:home' %}" class="btn btn-outline-dark">Back to admin</a>
+    </div>
+
+    <div class="row g-4">
+        {% for item in messages_inbox %}
+            <div class="col-12">
+                <div class="panel-card p-4 interactive-row">
+                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-3">
+                        <div>
+                            <div class="section-kicker mb-1">{{ item.role|default:"User"|title }}</div>
+                            <h2 class="h5 mb-1">{{ item.subject }}</h2>
+                            <div class="text-secondary">{{ item.contact_email }}{% if item.user %} · {{ item.user.username }}{% endif %} · {{ item.created_at|date:"M d, Y H:i" }}</div>
+                        </div>
+                        <span class="soft-stat">{{ item.get_status_display }}</span>
+                    </div>
+                    <div class="list-card mb-3">
+                        {{ item.message|linebreaks }}
+                    </div>
+                    <form method="post" class="d-flex flex-wrap gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="message_id" value="{{ item.id }}">
+                        <button class="btn btn-sm btn-outline-dark" type="submit" name="status" value="new">Mark new</button>
+                        <button class="btn btn-sm btn-outline-primary" type="submit" name="status" value="in_progress">In progress</button>
+                        <button class="btn btn-sm btn-outline-success" type="submit" name="status" value="resolved">Resolved</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="panel-card p-4">
+                    <p class="text-secondary mb-0">No support messages yet.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
