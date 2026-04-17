@@ -1,405 +1,325 @@
-# AI-Powered Employability and Skill Recommendation Platform
+# Youth Employability Project
 
-This repository contains a Django web application and a machine learning pipeline for predicting graduate employability, generating personalized skill recommendations, suggesting career paths, and supporting employer job matching.
+## Overview
 
-## Project overview
+This repository contains a dual-stack employability solution combining an AI model pipeline and a Django web application. It is built to analyze graduate employability data, train classification models for employment risk, generate personalized skill recommendations, and deliver prediction results through a web interface.
 
-The platform combines two major parts:
+### What it solves
 
-- A Django web app for authentication, role-based access, dashboards, jobs, analytics, and support workflows
-- A machine learning workspace for data processing, feature engineering, model training, evaluation, and recommendation logic
+- Builds a machine learning pipeline for graduate employability prediction and recommendation.
+- Produces actionable skill-improvement recommendations and career path suggestions.
+- Surfaces prediction reports via a Django app for authenticated users.
 
-## Core capabilities
+### Who it is for
 
-- Role-based accounts for `User`, `Employer`, and `Administrator`
-- Employability prediction dashboard powered by the trained ML model
-- Personalized skill recommendations and career path suggestions
-- Job posting and job browsing workflows
-- In-app admin dashboard for account management, traffic monitoring, and effectiveness tracking
-- Support messaging between users or employers and the admin team
+- Data scientists and ML engineers evaluating employability models.
+- Product teams building graduate career support platforms.
+- Developers integrating prediction-driven career advice into web applications.
 
-## Current status
+## Project Structure
 
-- End-to-end Django platform implemented
-- Trained model integrated into the prediction flow
-- In-app admin dashboard available without needing Django admin
-- Role-based access rules enforced for results and management views
-- Support inbox and status tracking implemented
-
-## Repository structure
-
-```text
+```
 Youth-Employability/
-|-- employabilityapp/                    # Django project
-|   |-- analytics_dashboard/
-|   |-- jobs/
-|   |-- prediction/
-|   |-- recommendations/
-|   |-- templates/
-|   `-- users/
-|-- employability-ai-system/            # ML pipeline and trained model workspace
-|   |-- data/
-|   |-- models/
-|   |-- src/
-|   `-- quick_train.py
-|-- global_graduate_employability_index.csv
-|-- model_ready_data.csv
-|-- requirements.txt
-`-- README.md
+├── data/
+│   └── processed/
+│       ├── model_predictions.csv
+│       └── processed_graduate_employability.csv
+├── employability-ai-system/
+│   ├── config/
+│   │   └── config.yaml
+│   ├── data/
+│   │   ├── external/
+│   │   ├── interim/
+│   │   ├── processed/
+│   │   │   ├── cleaned_data.csv
+│   │   │   └── final_features.csv
+│   │   └── raw/
+│   ├── figures/
+│   ├── main.py
+│   ├── quick_train.py
+│   ├── run_evaluation.py
+│   ├── run_recommendations.py
+│   ├── simple_train.py
+│   ├── src/
+│   │   ├── data/
+│   │   │   ├── load_data.py
+│   │   │   ├── preprocess.py
+│   │   │   ├── split_data.py
+│   │   │   └── validate_data.py
+│   │   ├── evaluation/
+│   │   │   ├── fairness.py
+│   │   │   ├── metrics.py
+│   │   │   ├── pipeline.py
+│   │   │   └── subgroup_analysis.py
+│   │   ├── features/
+│   │   │   ├── build_features.py
+│   │   │   ├── select_features.py
+│   │   │   ├── transform_features.py
+│   │   │   └── pipeline.py
+│   │   ├── models/
+│   │   │   ├── evaluate.py
+│   │   │   ├── pipeline.py
+│   │   │   ├── predict.py
+│   │   │   ├── registry.py
+│   │   │   ├── train.py
+│   │   │   └── tune.py
+│   │   ├── recommendation/
+│   │   │   ├── pipeline.py
+│   │   │   ├── rank.py
+│   │   │   ├── recommend.py
+│   │   │   ├── simulate.py
+│   │   │   └── skill_gap.py
+│   │   └── utils/
+│   ├── reports/
+│   │   ├── recommendation_experiments/
+│   │   └── results/
+│   └── notebooks/
+│       ├── 01_eda.ipynb
+│       ├── 02_feature_engineering.ipynb
+│       ├── 03_modelling.ipynb
+│       ├── 04_evaluation.ipynb
+│       └── 05_recommendation_experiments.ipynb
+├── employabilityapp/
+│   ├── manage.py
+│   ├── db.sqlite3
+│   ├── employabilityapp/
+│   │   ├── asgi.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── AIrecommendation/
+│   ├── analytics_dashboard/
+│   ├── jobs/
+│   ├── prediction/
+│   ├── recommendations/
+│   ├── templates/
+│   │   ├── analytics_dashboard/
+│   │   ├── base.html
+│   │   ├── jobs/
+│   │   ├── prediction/
+│   │   ├── recommendations/
+│   │   └── users/
+│   └── users/
+├── generated_plots/
+│   ├── advanced_model_comparison.png
+│   ├── classification_model_performance.png
+│   ├── correlation_heatmap.png
+│   ├── regression_model_performance.png
+│   └── ...
+├── cleaned_employability_analysis.ipynb
+├── Employability_analysis.ipynb
+├── requirements.txt
+└── tmp_inspect_data.py
 ```
 
-## Machine learning pipeline
+### Folder and file purposes
 
-The ML workspace supports:
+- `data/processed/`
 
-1. Data loading and preprocessing
-2. Feature engineering and transformation
-3. Model training and evaluation
-4. Fairness and subgroup analysis
-5. Recommendation generation
-6. Model persistence for Django inference
+  - Contains cleaned and derived dataset outputs.
+  - `model_predictions.csv` and `processed_graduate_employability.csv` are prepared datasets used for analysis and downstream model workflows.
+- `employability-ai-system/`
 
-### ML structure
+  - Core machine learning and recommendation pipeline.
+  - `main.py`: central entrypoint that documents available commands and verifies file checks.
+  - `quick_train.py`: trains baseline classification models and saves the best performer.
+  - `run_evaluation.py`: executes model evaluation and fairness analysis.
+  - `run_recommendations.py`: executes batch recommendation generation.
+  - `src/data/`: data ingestion, cleaning, splitting, and validation logic.
+  - `src/features/`: feature engineering pipeline for dataset transformation.
+  - `src/models/`: model training, evaluation, prediction, registry, and tuning logic.
+  - `src/evaluation/`: overall evaluation pipeline, subgroup analysis, and fairness assessment.
+  - `src/recommendation/`: skill-gap analysis, simulation, ranking, and recommendation output.
+  - `reports/`: saved evaluation and recommendation CSV outputs.
+  - `notebooks/`: exploratory data analysis and modelling notebooks.
+- `employabilityapp/`
 
-```text
-employability-ai-system/
-|-- quick_train.py
-|-- data/
-|   |-- processed/
-|   |-- raw/
-|   `-- interim/
-|-- models/
-|   |-- trained/
-|   `-- metadata/
-`-- src/
-    |-- api/
-    |-- dashboard/
-    |-- data/
-    |-- evaluation/
-    |-- features/
-    |-- models/
-    `-- recommendation/
-```
+  - Django application delivering prediction forms, result pages, recommendation summaries, and analytics dashboards.
+  - `manage.py`: Django admin and local server control.
+  - `employabilityapp/settings.py`: Django settings, SQLite configuration, installed apps, templates, and URLs.
+  - `employabilityapp/urls.py`: routes requests to prediction, recommendations, jobs, analytics, and user modules.
+  - `prediction/`: main application logic for employability assessment forms, summary pages, detail views, report download and prediction services.
+  - `recommendations/`: app for storing and showing recommendation models results.
+  - `jobs/`: job posting logic used for matching assessments to active roles.
+  - `analytics_dashboard/`: dashboard pages and middleware for tracking application usage.
+  - `users/`: authentication, registration, permissions, profile forms, and user management.
+- `generated_plots/`
 
-### Main ML components
+  - Exported visualization artifacts from the analysis notebooks.
+  - Includes model performance charts, correlation heatmaps, cluster analysis dashboards, and more.
+- `cleaned_employability_analysis.ipynb` and `Employability_analysis.ipynb`
 
-- `src/data/`: dataset loading, validation, and preprocessing
-- `src/features/`: feature building, transformation, and selection
-- `src/models/`: training, evaluation, tuning, persistence, and prediction
-- `src/evaluation/`: metrics, fairness checks, and subgroup analysis
-- `src/recommendation/`: skill-gap detection, simulation, ranking, and recommendation workflows
+  - Jupyter notebooks for data cleaning, exploration, and model development.
+- `requirements.txt`
 
-## Jupyter notebook
+  - Lists Python dependencies required for both the Django app and the AI/pipeline stack.
+- `tmp_inspect_data.py`
 
-The repository also includes a Jupyter notebook:
+  - Utility script likely used for inspecting dataset characteristics during development.
 
-- `Employability_analysis.ipynb`
+## Installation and Setup
 
-This notebook is the main exploratory analysis workspace for the project. It captures the earlier research and experimentation process that informed both the machine learning pipeline and the Django platform.
+### Prerequisites
 
-### What the notebook is about
+- Python 3.12 (or compatible 3.x interpreter)
+- `pip` package manager
+- Local development environment with access to repository files
 
-The notebook focuses on understanding graduate employability patterns from the source dataset and translating those findings into useful prediction features and product ideas.
-
-It is designed to help answer questions such as:
-
-- which academic and market factors are most associated with stronger employability outcomes
-- how salary, demand, reputation, and remote-work availability relate to graduate success
-- which fields of study appear to have stronger or weaker outcomes
-- what kinds of skill patterns are common among higher-employability profiles
-- how the dataset should be cleaned and prepared before model training
-
-### What the notebook typically contains
-
-The notebook is used for a full exploratory and analytical workflow, including:
-
-- loading the employability dataset into pandas
-- checking data quality, missing values, and column structure
-- exploring categorical fields such as degree level, region, and field of study
-- summarizing numeric indicators like salary, employer reputation, remote-work availability, and skill demand
-- generating charts and visual summaries to reveal patterns and outliers
-- examining relationships between candidate features and employability-related outcomes
-- preparing features that can later be reused in the ML scripts
-- testing ideas for modeling, clustering, scoring, or recommendation logic
-
-### How it relates to the rest of the repository
-
-The notebook is complementary to the production code:
-
-- it is the research and experimentation environment
-- the code in `employability-ai-system/` is the reusable ML pipeline built from that experimentation
-- the code in `employabilityapp/` is the deployed Django application that consumes the trained model
-
-In other words:
-
-- use the notebook to explore, analyze, visualize, and prototype
-- use the ML scripts to train and persist repeatable models
-- use the Django app to serve predictions and recommendations to real users through the web interface
-
-### Typical outputs from the notebook
-
-Depending on which cells are run, the notebook may produce:
-
-- summary tables
-- descriptive statistics
-- correlation views
-- distribution plots
-- outlier comparisons
-- feature-oriented observations
-- intermediate datasets that help guide feature engineering and model-building decisions
-
-Some generated plots and CSV outputs in the repository come from this broader analysis workflow, including files such as:
-
-- `correlation_heatmap.png`
-- `outlier_plots.png`
-- `outlier_treatment_comparison.png`
-- `salary_by_field.png`
-- `classification_model_results.csv`
-- `regression_model_results.csv`
-
-### When to use the notebook
-
-The notebook is especially useful when you want to:
-
-- understand the dataset before retraining the model
-- validate whether the web-app inputs still match the original analysis assumptions
-- experiment with new features or scoring approaches
-- inspect trends for presentation or academic reporting
-- compare data insights with what the live Django application is showing
-
-If you want to run the notebook locally, activate your virtual environment and install Jupyter if needed:
-
-```powershell
-pip install jupyter
-jupyter notebook
-```
-
-Then open `Employability_analysis.ipynb` from the browser interface.
-
-The notebook complements the production Django app and the reusable ML scripts in `employability-ai-system/`, but it is mainly intended for analysis, experimentation, and reporting.
-
-## Local deployment guide
-
-These steps deploy and run the full platform on a local machine.
-
-### 1. Prerequisites
-
-- Python 3.11 or newer
-- `pip`
-- Git optional, if you are cloning the project
-
-### 2. Open the project folder
-
-```powershell
-cd path\to\Youth-Employability
-```
-
-### 3. Create and activate a virtual environment
-
-Windows PowerShell:
-
-```powershell
-python -m venv .venv
-.venv\Scripts\Activate.ps1
-```
-
-Windows Command Prompt:
-
-```cmd
-python -m venv .venv
-.venv\Scripts\activate
-```
-
-macOS or Linux:
+### Install dependencies
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
-```
-
-### 4. Install dependencies
-
-From the repository root:
-
-```powershell
+cd c:\Users\kinut\Youth-Employability
+python -m venv .venv
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 5. Train or refresh the machine learning model
+### Machine learning pipeline setup
 
-The Django app loads the trained model from:
+1. Verify that processed dataset exists:
+   - `employability-ai-system/data/processed/final_features.csv`
+2. Run model training:
+   - `python employability-ai-system/quick_train.py`
+3. Evaluate the trained model:
+   - `python employability-ai-system/run_evaluation.py`
+4. Generate sample recommendations:
+   - `python employability-ai-system/run_recommendations.py`
 
-`employability-ai-system/models/trained/best_model.pkl`
+### Django app setup
 
-To generate or refresh it locally, run from the repository root:
+1. Change directory into the web app:
+   - `cd employabilityapp`
+2. Apply migrations:
+   - `python manage.py migrate`
+3. Create a superuser if needed:
+   - `python manage.py createsuperuser`
+4. Start the development server:
+   - `python manage.py runserver`
+5. Open the app in a browser:
+   - `http://127.0.0.1:8000/`
 
-```powershell
-python employability-ai-system\quick_train.py
-```
+## Methodology / Approach
 
-This writes updated artifacts into:
+### Data and model approach
 
-- `employability-ai-system/models/trained/`
-- `employability-ai-system/data/processed/`
+- The AI system uses a processed dataset built from `employability-ai-system/data/processed/final_features.csv`.
+- The target variable is `Employment_Rate_12_Months (%)`.
+- The model training pipeline binarizes this target at an 85% employment threshold, producing a classification label.
+- Baseline classifiers trained in `src/models/train.py` include:
+  - Logistic Regression
+  - Random Forest
+  - Gradient Boosting
+- `quick_train.py` evaluates these models and selects `GradientBoosting` as the best performer by ROC-AUC.
 
-If the trained model already exists and you do not need to rebuild it, you can skip this step.
+### Evaluation and fairness
 
-### 6. Apply Django migrations
+- `src/evaluation/pipeline.py` computes:
+  - accuracy
+  - precision
+  - recall
+  - F1-score
+  - ROC-AUC
+  - confusion matrix
+- It also runs subgroup analysis by region and computes fairness disparity metrics to flag potential bias across demographic segments.
 
-Move into the Django project folder:
+### Recommendation logic
 
-```powershell
-cd employabilityapp
-```
+- The recommendation engine uses a three-stage workflow:
+  1. `skill_gap.py` identifies missing skills and weak profile features.
+  2. `simulate.py` estimates the benefit of adding skills or improving feature values.
+  3. `rank.py` ranks recommendations by predicted improvement.
+- The output includes skill recommendations, portfolio guidance, and career path suggestions.
 
-Run:
+### Django app prediction service
 
-```powershell
-python manage.py makemigrations
-python manage.py migrate
-```
+- `prediction/services.py` builds a feature frame from user input and attempts to load the trained model.
+- If no saved model is available, the app falls back to a heuristic scoring mechanism.
+- Model scores are calibrated with a 65/35 weighting between model probability and heuristic score.
+- The service returns:
+  - `employability_score`
+  - `risk_category`
+  - `strengths` / `weaknesses`
+  - recommended skill actions
+  - career path suggestions
+  - HTML report content
 
-The project uses SQLite by default for local development, so no separate database setup is required.
+## Usage
 
-### 7. Start the local server
+### AI system commands
 
-From inside `employabilityapp/`:
+- Check system status:
+  - `python employability-ai-system/main.py --status`
+- Train and save models:
+  - `python employability-ai-system/quick_train.py`
+- Evaluate models and fairness:
+  - `python employability-ai-system/run_evaluation.py`
+- Generate a single user recommendation demo:
+  - `python employability-ai-system/test_recommendations.py`
+- Generate batch recommendations:
+  - `python employability-ai-system/run_recommendations.py`
 
-```powershell
-python manage.py runserver
-```
+### Django application workflow
 
-Open:
+- Access landing page at `/`.
+- Log in via `/users/` pages.
+- Submit employability profile through the prediction dashboard.
+- View assessment details, matched jobs, AI report, and recommendations.
+- Download the HTML report from the assessment detail page.
 
-`http://127.0.0.1:8000/`
+## Results / Outputs
 
-### 8. Register accounts and use the app
+### AI system outputs
 
-Important routes:
+- Saved evaluation results in `employability-ai-system/reports/results/model_evaluation.csv`
+- Saved recommendation outputs in `employability-ai-system/reports/recommendations/skill_recommendations.csv`
+- Saved summary output in `employability-ai-system/reports/recommendations/recommendations_summary.csv`
 
-- Home: `http://127.0.0.1:8000/`
-- Register: `http://127.0.0.1:8000/users/register/`
-- Login: `http://127.0.0.1:8000/users/login/`
-- Admin dashboard: `http://127.0.0.1:8000/analytics/`
+### Visual outputs
 
-Available roles:
+- Analysis notebooks export charts to `generated_plots/` including:
+  - model performance comparisons
+  - regression and classification diagnostics
+  - correlation heatmaps
+  - cluster analysis dashboards
 
-- `User`
-- `Employer`
-- `Administrator`
+### Django outputs
 
-Role behavior:
+- Prediction assessment records in SQLite at `employabilityapp/db.sqlite3`
+- Stored `SkillRecommendation`, `CareerPathSuggestion`, and `AIReport` records for assessments
 
-- Users can create assessments and only view their own results
-- Employers can post jobs and view candidate results
-- Users can browse employers and listed jobs
-- Admins can manage users, employers, support messages, and usage analytics inside the app
+## Key Insights
 
-### 9. Admin signup code
+- The repository combines a standalone AI modeling pipeline with a production-style Django front end.
+- The training pipeline prefers Gradient Boosting for classification, reflecting higher ROC-AUC compared to baseline models.
+- Recommendation logic is grounded in skill gaps and simulated impact rather than only rule-based output.
+- The application emphasizes both model performance and fairness across regional subgroups.
 
-Admin registration requires a special signup code generated in:
+## Limitations
 
-`employabilityapp/employabilityapp/settings.py`
+- The repository does not include all raw source datasets within the root project tree. Some expected dataset files referenced by the prediction service are missing, such as `global_graduate_employability_index.csv` and `model_ready_data.csv`.
+- The Django app currently relies on SQLite and debug mode, which is not production-ready.
+- The current scoring model is a hybrid of trained model output and heuristic fallback, so results depend on available saved model artifacts.
+- There is no root-level documentation describing deployment or CI, so setup requires inspection of scripts and code.
 
-Current logic:
+## Future Improvements
 
-```python
-ADMIN_SIGNUP_CODE = hashlib.sha256(SECRET_KEY.encode()).hexdigest()[:12].upper()
-```
+- Add a root-level `README.md` and documentation for dataset prerequisites and deployment.
+- Replace SQLite with a production-grade database for the Django app.
+- Add explicit dataset ingestion scripts to `employability-ai-system/data/raw/` and integrate them into pipeline automation.
+- Implement model hyperparameter search or cross-validation inside `src/models/tune.py`.
+- Add unit tests for the Django prediction flow and AI recommendation endpoints.
+- Add a dedicated API or Streamlit dashboard for real-time recommendations and model explainability.
 
-With the current local `SECRET_KEY`, the code is:
+## Technologies Used
 
-```text
-
-```
-
-If you change `SECRET_KEY`, the generated admin code will also change.
-
-## Useful commands
-
-From the repository root:
-
-```powershell
-pip install -r requirements.txt
-python employability-ai-system\quick_train.py
-pip install jupyter
-jupyter notebook
-```
-
-From `employabilityapp/`:
-
-```powershell
-python manage.py check
-python manage.py makemigrations
-python manage.py migrate
-python manage.py runserver
-```
-
-## Model performance
-
-The current trained workflow achieved strong results during local training:
-
-- Best model: `GradientBoostingClassifier`
-- ROC-AUC: about `0.9723`
-
-The web app uses the saved trained model and calibrates scores at inference time so manually entered profiles behave more realistically in the UI.
-
-## Recommendation methodology
-
-The recommendation layer is based on model-informed profile gaps and field-specific expectations.
-
-It currently supports:
-
-- skill-gap detection
-- targeted upskilling suggestions
-- career-path recommendations
-- report-ready strengths and weaknesses summaries
-
-The ML workspace also contains more advanced recommendation modules under:
-
-- `employability-ai-system/src/recommendation/`
-
-## Legacy ML utilities in the repository
-
-The repository still contains supporting ML code for:
-
-- FastAPI service scaffolding
-- Streamlit dashboard scaffolding
-- evaluation scripts
-- recommendation batch scripts
-
-Examples:
-
-```powershell
-python employability-ai-system\run_evaluation.py
-python employability-ai-system\run_recommendations.py
-```
-
-These scripts are secondary to the Django app but remain useful for experimentation and model development.
-
-## Technology stack
-
-- Django 5
-- SQLite for local development
-- Pandas
-- NumPy
-- Scikit-learn
-- Joblib
+- Python
+- Django 5.2.x
+- pandas
+- numpy
+- scikit-learn
+- joblib
 - FastAPI
 - Uvicorn
 - Pydantic
 - Streamlit
-- Bootstrap HTML templates
-
-## Notes for future production deployment
-
-- Move `SECRET_KEY` and other secrets into environment variables
-- Set `DEBUG = False`
-- Expand `ALLOWED_HOSTS`
-- Replace SQLite with PostgreSQL
-- Configure static files for production
-- Add a production WSGI or ASGI server such as Gunicorn, Uvicorn, or IIS-compatible hosting depending on target environment
-
-## License
-
-This project is for educational and research purposes.
+- Matplotlib
